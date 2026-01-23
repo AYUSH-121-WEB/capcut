@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Notifications</h2>
+        <div class="space-y-4">
+            {% for notification in notifications %}
+            <div
+                class="flex items-center justify-between p-4 rounded-lg {% if not notification.is_read %}bg-indigo-50 border-l-4 border-indigo-500{% else %}bg-gray-50{% endif %}">
+                <div class="flex items-center space-x-3">
+                    {% if notification.sender.profile.profile_image %}
+                    <img src="{{ notification.sender.profile.profile_image.url }}"
+                        class="w-10 h-10 rounded-full object-cover">
+                    {% else %}
+                    <div
+                        class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-bold">
+                        {{ notification.sender.username|make_list|first|upper }}
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <p class="text-gray-800 text-sm">
+                            <span class="font-bold">{{ notification.sender.username }}</span>
+                            {% if notification.notification_type == 'follow' %}
+                            started following you.
+                            {% elif notification.notification_type == 'like' %}
+                            liked your post.
+                            {% elif notification.notification_type == 'comment' %}
+                            commented on your post.
+                            {% endif %}
+                        </p>
+                        <span class="text-xs text-gray-500">{{ notification.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+                {% if notification.post %}
+                <a href="{% url 'post_detail' notification.post.pk %}"
+                    class="text-indigo-600 text-sm hover:underline">View Post</a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-gray-500 text-center">No notifications yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6">
+            {% if is_paginated %}
+            <div class="flex justify-between">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="text-indigo-600 hover:underline">Previous</a>
+                {% else %}
+                <span></span>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="text-indigo-600 hover:underline">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

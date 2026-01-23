@@ -1,0 +1,140 @@
+<div class="relative h-full w-full bg-black flex items-center justify-center overflow-hidden shrink-0 snap-start">
+    <!-- Media Background -->
+    <div class="absolute inset-0 z-0 flex items-center justify-center bg-gray-900">
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="w-full h-full object-contain">
+        {% elif post.video %}
+        <video class="w-full h-full object-contain" loop muted playsinline
+            onclick="this.paused ? this.play() : this.pause()">
+            <source src="{{ post.video.url }}" type="video/mp4">
+        </video>
+        {% else %}
+        <!-- Text Only Post Fallback -->
+        <div class="p-8 text-center">
+            <p class="text-white text-xl font-medium">{{ post.content }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80 z-10 pointer-events-none">
+    </div>
+
+    <!-- Top Bar (Back/Search area protected) -->
+    <div class="absolute top-0 left-0 w-full p-4 z-20 pointer-events-auto flex justify-between items-start">
+        <div class="flex items-center space-x-2">
+            <!-- Author Info Small Top-Left (Optional, providing context) -->
+            {% if post.author.profile.profile_image %}
+            <img src="{{ post.author.profile.profile_image.url }}" class="w-8 h-8 rounded-full border border-white/50">
+            {% else %}
+            <div
+                class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold">
+                {{ post.author.username|slice:":1"|upper }}
+            </div>
+            {% endif %}
+            <span class="text-white font-semibold text-sm shadow-md">{{ post.author.username }}</span>
+        </div>
+
+        <!-- Dropdown Menu -->
+        <div class="relative" x-data="{ open: false }">
+            <button onclick="document.getElementById('dropdown-fs-{{ post.pk }}').classList.toggle('hidden')"
+                class="text-white p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                </svg>
+            </button>
+            <div id="dropdown-fs-{{ post.pk }}"
+                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-30 py-1">
+                {% if user.is_authenticated and user != post.author %}
+                <button
+                    onclick="openReportModal({{ post.pk }}); document.getElementById('dropdown-fs-{{ post.pk }}').classList.add('hidden')"
+                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Report</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Actions -->
+    <div class="absolute right-2 bottom-20 z-20 flex flex-col items-center space-y-6 pointer-events-auto w-16">
+
+        <!-- Profile/Follow -->
+        <div class="relative group">
+            <a href="{% url 'profile' post.author.username %}">
+                {% if post.author.profile.profile_image %}
+                <img src="{{ post.author.profile.profile_image.url }}"
+                    class="w-12 h-12 rounded-full border-2 border-white object-cover">
+                {% else %}
+                <div
+                    class="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white text-lg font-bold border-2 border-white">
+                    {{ post.author.username|slice:":1"|upper }}
+                </div>
+                {% endif %}
+            </a>
+            {% if user.is_authenticated and user != post.author %}
+            <button onclick="toggleFollow('{{ post.author.username }}')"
+                class="follow-btn-{{ post.author.username }} absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-red-500 text-white rounded-full p-0.5 w-5 h-5 flex items-center justify-center shadow-sm hover:scale-110 transition {% if user in post.author.profile.followers.all %}hidden{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd" />
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- Like -->
+        <button onclick="toggleLike({{ post.pk }})" class="flex flex-col items-center group">
+            <div class="p-2 rounded-full bg-black/20 backdrop-blur-sm group-hover:bg-black/40 transition">
+                <svg class="like-icon-{{ post.pk }} h-8 w-8 transition transform group-active:scale-125 {% if request.user in post.likes.all %}text-red-500 fill-current{% else %}text-white fill-current{% endif %}"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+            </div>
+            <span class="like-count-{{ post.pk }} text-white text-xs font-medium mt-1 shadow-sm">{{ post.likes.count
+                }}</span>
+        </button>
+
+        <!-- Comment -->
+        <a href="{% url 'post_detail' post.pk %}" class="flex flex-col items-center group">
+            <div class="p-2 rounded-full bg-black/20 backdrop-blur-sm group-hover:bg-black/40 transition">
+                <svg class="h-8 w-8 text-white fill-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
+                </svg>
+            </div>
+            <span class="text-white text-xs font-medium mt-1 shadow-sm">{{ post.comments.count }}</span>
+        </a>
+
+        <!-- Share (Mock) -->
+        <button class="flex flex-col items-center group">
+            <div class="p-2 rounded-full bg-black/20 backdrop-blur-sm group-hover:bg-black/40 transition">
+                <svg class="h-8 w-8 text-white fill-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.66 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+                </svg>
+            </div>
+            <span class="text-white text-xs font-medium mt-1">Share</span>
+        </button>
+    </div>
+
+    <!-- Bottom Caption Area -->
+    <div class="absolute bottom-4 left-4 right-16 z-20 pointer-events-auto text-white">
+        <a href="{% url 'profile' post.author.username %}"
+            class="font-bold text-lg hover:underline shadow-md mb-1 block">@{{ post.author.username }}</a>
+        <div class="text-sm md:text-base opacity-95 mb-2 line-clamp-2 md:line-clamp-4 shadow-sm">
+            {{ post.content }}
+        </div>
+
+        {% if post.tags.all %}
+        <div class="flex flex-wrap gap-2 mb-2">
+            {% for tag in post.tags.all %}
+            <span class="text-indigo-400 font-bold text-xs">#{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <p class="text-xs text-white/60">{{ post.created_at|timesince }} ago</p>
+    </div>
+</div>

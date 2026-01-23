@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <!-- Cover Image -->
+    <div class="h-48 bg-gray-300 relative">
+        {% if profile.cover_image %}
+        <img src="{{ profile.cover_image.url }}" class="w-full h-full object-cover">
+        {% endif %}
+    </div>
+
+    <div class="px-6 py-4 relative">
+        <!-- Profile Image -->
+        <div class="absolute -top-16 left-6">
+            {% if profile.profile_image %}
+            <img src="{{ profile.profile_image.url }}"
+                class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-md">
+            {% else %}
+            <div
+                class="w-32 h-32 rounded-full border-4 border-white bg-gray-400 flex items-center justify-center text-white text-4xl font-bold">
+                {{ profile.user.username|make_list|first|upper }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mt-16 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ profile.user.username }}</h1>
+                <p class="text-gray-600">{{ profile.bio|default:"No bio yet." }}</p>
+            </div>
+            <div class="mt-4 sm:mt-0 space-x-2">
+                {% if user == profile.user %}
+                <a href="{% url 'edit_profile' %}"
+                    class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-300">Edit
+                    Profile</a>
+                {% else %}
+                {% if user.is_authenticated and user != profile.user %}
+                <button onclick="toggleFollow('{{ profile.user.username }}', this)"
+                    class="px-4 py-2 rounded-md font-medium transition-colors {% if is_following %}bg-gray-200 text-gray-800{% else %}bg-indigo-600 text-white hover:bg-indigo-700{% endif %}">
+                    {% if is_following %}Following{% else %}Follow{% endif %}
+                </button>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-6 border-t pt-6 grid grid-cols-3 gap-4 text-center">
+            <div>
+                <span class="block text-xl font-bold text-gray-900">{{ profile.user.posts.all.count }}</span>
+                <span class="text-sm text-gray-500">Posts</span>
+            </div>
+            <div>
+                <span class="block text-xl font-bold text-gray-900 follower-count-{{ profile.user.username }}">{{ profile.followers.all.count }}</span>
+                <span class="text-sm text-gray-500">Followers</span>
+            </div>
+            <div>
+                <span class="block text-xl font-bold text-gray-900">{{ profile.user.following.all.count }}</span>
+                <span class="text-sm text-gray-500">Following</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-8">
+    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Posts</h2>
+    <div class="space-y-6">
+        {% for post in profile.user.posts.all %}
+        {% include 'posts/includes/post_card.html' with post=post %}
+        {% empty %}
+        <div class="bg-white dark:bg-dark-surface p-8 rounded-lg shadow text-center">
+            <p class="text-gray-500 dark:text-gray-400">No posts yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

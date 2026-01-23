@@ -1,0 +1,245 @@
+<div id="createPostModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+
+        <!-- Backdrop -->
+        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"
+            onclick="closeCreatePostModal()"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <!-- Modal Panel -->
+        <div
+            class="inline-block px-4 pt-5 pb-4 text-left align-bottom transition-all transform bg-white dark:bg-dark-surface rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+
+            <div class="absolute top-0 right-0 pt-4 pr-4">
+                <button type="button" onclick="closeCreatePostModal()"
+                    class="text-gray-400 bg-transparent rounded-md hover:text-gray-500 focus:outline-none">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sm:flex sm:items-start">
+                <div class="w-full mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white" id="modal-title">
+                        Create Post
+                    </h3>
+                    <div class="mt-4">
+                        <form id="createPostForm" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <!-- Content -->
+                            <div class="mb-4">
+                                <textarea name="content" rows="4"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 dark:border-dark-border dark:bg-[#2A2A2A] dark:text-white rounded-md p-2"
+                                    placeholder="What's on your mind?"></textarea>
+                            </div>
+
+                            <!-- Image/Video Upload -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Add to
+                                    your post</label>
+                                <div class="flex items-center space-x-4">
+                                    <label
+                                        class="cursor-pointer flex items-center space-x-2 px-4 py-2 bg-gray-50 dark:bg-[#333] border border-gray-300 dark:border-dark-border rounded-md hover:bg-gray-100 dark:hover:bg-[#444] transition">
+                                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">Photo/Video</span>
+                                        <input type="file" name="media" class="hidden" accept="image/*,video/*"
+                                            onchange="previewMedia(this)">
+                                    </label>
+                                </div>
+                                <div id="mediaPreview" class="mt-4 hidden relative">
+                                    <button type="button" onclick="clearMedia()"
+                                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none shadow-md z-10">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                    <div
+                                        class="rounded-lg overflow-hidden border border-gray-200 dark:border-dark-border">
+                                        <!-- Preview IMG or VIDEO injected here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hashtags -->
+                            <div class="mb-4">
+                                <label for="hashtags"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hashtags</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 sm:text-sm">#</span>
+                                    </div>
+                                    <input type="text" name="hashtags" id="hashtagsInput"
+                                        class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 dark:border-dark-border dark:bg-[#2A2A2A] dark:text-white rounded-md py-2"
+                                        placeholder="django, python, coding (separate with space or comma)">
+                                </div>
+                                <div id="hashtagsPreview" class="flex flex-wrap gap-2 mt-2">
+                                    <!-- Dynamic Badge Preview -->
+                                </div>
+                            </div>
+
+                            <div class="mt-5 sm:mt-6 flex justify-end">
+                                <button type="button" onclick="closeCreatePostModal()"
+                                    class="mr-3 bg-white dark:bg-transparent py-2 px-4 border border-gray-300 dark:border-dark-border rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#333] focus:outline-none">
+                                    Cancel
+                                </button>
+                                <button type="submit" id="submitPostBtn"
+                                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                                    Post
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Modal Logic ---
+    function openCreatePostModal() {
+        document.getElementById('createPostModal').classList.remove('hidden');
+    }
+
+    function closeCreatePostModal() {
+        document.getElementById('createPostModal').classList.add('hidden');
+        // Optional: Reset form
+        // document.getElementById('createPostForm').reset();
+        // clearMedia();
+    }
+
+    // --- Media Preview ---
+    function previewMedia(input) {
+        const previewContainer = document.getElementById('mediaPreview');
+        const contentDiv = previewContainer.querySelector('div');
+        const file = input.files[0];
+
+        contentDiv.innerHTML = ''; // Clear prev
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewContainer.classList.remove('hidden');
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-auto max-h-64 object-cover';
+                    contentDiv.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = e.target.result;
+                    video.className = 'w-full h-auto max-h-64 object-cover';
+                    video.controls = true;
+                    contentDiv.appendChild(video);
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearMedia() {
+        document.getElementById('mediaPreview').classList.add('hidden');
+        document.querySelector('input[name="media"]').value = '';
+    }
+
+    // --- Hashtag Preview ---
+    const hashtagsInput = document.getElementById('hashtagsInput');
+    const hashtagsPreview = document.getElementById('hashtagsPreview');
+
+    hashtagsInput.addEventListener('input', function (e) {
+        const val = e.target.value;
+        const tags = val.split(/[\s,]+/).filter(t => t.length > 0);
+
+        hashtagsPreview.innerHTML = '';
+        tags.forEach(tag => {
+            // Remove # if they typed it, to clean up
+            let cleanTag = tag.replace(/^#/, '');
+            if (cleanTag) {
+                const badge = document.createElement('span');
+                badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
+                badge.innerText = '#' + cleanTag;
+                hashtagsPreview.appendChild(badge);
+            }
+        });
+    });
+
+    // --- AJAX Submission ---
+    document.getElementById('createPostForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('submitPostBtn');
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerText = 'Posting...';
+
+        const formData = new FormData(this);
+
+        fetch("{% url 'create_post_ajax' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}' // Ensure we have the token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerText = originalText;
+
+                if (data.success) {
+                    closeCreatePostModal();
+                    showToast('Post created successfully!', 'success');
+
+                    // Prepend new post to feed if we are on the feed page
+                    const postsContainer = document.getElementById('posts-container');
+                    if (postsContainer) {
+                        // Create a temp div to parse HTML
+                        const temp = document.createElement('div');
+                        temp.innerHTML = data.post_html;
+                        const newPost = temp.firstElementChild;
+
+                        // Add animation class
+                        newPost.classList.add('animate-pulse'); // Simple highlight
+                        postsContainer.prepend(newPost);
+
+                        setTimeout(() => newPost.classList.remove('animate-pulse'), 2000);
+
+                        // Remove "No posts yet" if it exists
+                        // (Simplification: just checking if generic placeholder exists)
+                    } else {
+                        // Maybe redirect if not on feed? Or just stay.
+                        // If user created post from Profile, we might want to reload or add there.
+                        if (window.location.pathname === '/' || window.location.pathname.includes('/profile/')) {
+                            window.location.reload();
+                        }
+                    }
+
+                    // Clear form
+                    document.getElementById('createPostForm').reset();
+                    clearMedia();
+                    hashtagsPreview.innerHTML = '';
+
+                } else {
+                    showToast(data.error || 'Error creating post', 'error');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerText = originalText;
+                console.error(err);
+                showToast('Something went wrong.', 'error');
+            });
+    });
+</script>

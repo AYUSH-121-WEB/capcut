@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Create Post</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Content</label>
+            {{ form.content }}
+            {% if form.content.errors %}
+            <p class="text-red-500 text-xs italic">{{ form.content.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Image</label>
+            {{ form.image }}
+        </div>
+
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Video</label>
+            {{ form.video }}
+        </div>
+
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Hashtags</label>
+            <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500 sm:text-sm">#</span>
+                </div>
+                {{ form.hashtags }}
+            </div>
+            <div id="hashtagsPreview" class="flex flex-wrap gap-2 mt-2"></div>
+            <p class="text-xs text-gray-500 italic">Separate with space or comma</p>
+        </div>
+
+        <script>
+            const hashtagsInput = document.getElementById('id_hashtags');
+            const hashtagsPreview = document.getElementById('hashtagsPreview');
+
+            if (hashtagsInput) {
+                // Ensure correct classes are applied to the Django-rendered input
+                hashtagsInput.className = 'focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md py-2';
+                hashtagsInput.placeholder = 'django, python, coding...';
+
+                hashtagsInput.addEventListener('input', function (e) {
+                    const val = e.target.value;
+                    const tags = val.split(/[\s,]+/).filter(t => t.length > 0);
+
+                    hashtagsPreview.innerHTML = '';
+                    tags.forEach(tag => {
+                        let cleanTag = tag.replace(/^#/, '');
+                        if (cleanTag) {
+                            const badge = document.createElement('span');
+                            badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800';
+                            badge.innerText = '#' + cleanTag;
+                            hashtagsPreview.appendChild(badge);
+                        }
+                    });
+                });
+            }
+        </script>
+
+        <div class="flex justify-end pt-4">
+            <a href="{% url 'home' %}" class="mr-4 text-gray-600 px-4 py-2 hover:underline">Cancel</a>
+            <button type="submit"
+                class="bg-indigo-600 text-white px-6 py-2 rounded-md font-medium hover:bg-indigo-700">Post</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

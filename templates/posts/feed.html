@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+
+    <!-- Feed Header / Story Placeholder could go here -->
+
+    <!-- Main Feed Area -->
+    <div class="space-y-6">
+
+        <!-- Quick Post Trigger (Refined) Removed -->
+
+        <!-- Posts Loop -->
+        <!-- Posts Loop -->
+        <div id="posts-container" class="space-y-6">
+            {% for post in posts %}
+            {% include 'posts/includes/post_card.html' %}
+            {% empty %}
+            <div class="text-center py-16 bg-white dark:bg-dark-surface rounded-xl shadow-sm">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No posts yet</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new post.</p>
+                <div class="mt-6">
+                    <!-- Button Removed -->
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination (Basic) -->
+        {% if is_paginated %}
+        <div class="py-4 flex justify-center">
+            <span class="step-links text-sm text-gray-500 dark:text-gray-400">
+                {% if page_obj.has_previous %}
+                <a href="?page=1" class="hover:text-indigo-600">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="hover:text-indigo-600">previous</a>
+                {% endif %}
+
+                <span class="current font-medium">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="hover:text-indigo-600">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="hover:text-indigo-600">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

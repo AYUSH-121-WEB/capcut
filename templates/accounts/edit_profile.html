@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 px-4">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
+        <a href="{% url 'profile' user.username %}"
+            class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">View Profile</a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data"
+        class="bg-white dark:bg-dark-surface rounded-xl shadow-lg overflow-hidden">
+        {% csrf_token %}
+
+        <!-- Cover Image Area -->
+        <div class="relative h-48 md:h-64 bg-gray-200 dark:bg-gray-700 group">
+            {% if form.instance.cover_image %}
+            <img id="cover-preview" src="{{ form.instance.cover_image.url }}"
+                class="w-full h-full object-cover transition-opacity duration-300">
+            {% else %}
+            <img id="cover-preview" src="" class="hidden w-full h-full object-cover">
+            <div id="cover-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-400">
+                <span class="text-sm">No Cover Image</span>
+            </div>
+            {% endif %}
+
+            <!-- Overlay & Button -->
+            <div
+                class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button type="button" onclick="document.getElementById('id_cover_image').click()"
+                    class="bg-black/50 text-white px-4 py-2 rounded-lg backdrop-blur-sm hover:bg-black/70 transition flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Change Cover</span>
+                </button>
+            </div>
+            <!-- Hidden Input -->
+            <input type="file" name="cover_image" accept="image/*" id="id_cover_image" class="hidden"
+                onchange="previewImage(this, 'cover-preview')">
+        </div>
+
+        <!-- content container -->
+        <div class="px-8 pb-8 relative">
+
+            <!-- Profile Image Area -->
+            <div class="relative -mt-16 mb-6 inline-block group">
+                <div
+                    class="relative w-32 h-32 rounded-full border-4 border-white dark:border-dark-surface overflow-hidden shadow-md bg-white dark:bg-gray-800">
+                    {% if form.instance.profile_image %}
+                    <img id="profile-preview" src="{{ form.instance.profile_image.url }}"
+                        class="w-full h-full object-cover">
+                    {% else %}
+                    <div id="profile-placeholder"
+                        class="w-full h-full flex items-center justify-center bg-indigo-500 text-white text-3xl font-bold">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <img id="profile-preview" src="" class="hidden w-full h-full object-cover">
+                    {% endif %}
+                </div>
+
+                <!-- Overlay Button -->
+                <button type="button" onclick="document.getElementById('id_profile_image').click()"
+                    class="absolute bottom-1 right-1 bg-indigo-600 text-white p-2 rounded-full shadow-lg hover:bg-indigo-700 transition"
+                    title="Change Profile Photo">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+                <!-- Hidden Input -->
+                <input type="file" name="profile_image" accept="image/*" id="id_profile_image" class="hidden"
+                    onchange="previewImage(this, 'profile-preview')">
+            </div>
+
+            <div class="space-y-6 max-w-lg">
+                <!-- User Info Info (Read Only) -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ user.username }}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+                </div>
+
+                <!-- Bio Field -->
+                <div>
+                    <label for="id_bio"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bio</label>
+                    <textarea name="bio" id="id_bio" rows="4"
+                        class="w-full rounded-lg border-gray-300 dark:border-dark-border bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition p-3"
+                        placeholder="Tell us more about yourself...">{{ form.instance.bio }}</textarea>
+                    <p class="text-xs text-gray-500 mt-1 text-right">Max 500 characters</p>
+                </div>
+
+                {% if form.errors %}
+                <div class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg text-sm">
+                    {{ form.errors }}
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="pt-4 flex items-center space-x-4">
+                    <button type="submit"
+                        class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-indigo-700 shadow-md transition transform hover:scale-105">Save
+                        Changes</button>
+                    <a href="{% url 'profile' user.username %}"
+                        class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function previewImage(input, previewId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var preview = document.getElementById(previewId);
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+
+                // Hide placeholder if exists (for profile image)
+                var placeholder = document.getElementById('profile-placeholder');
+                if (placeholder && previewId === 'profile-preview') {
+                    placeholder.classList.add('hidden');
+                }
+                // Hide placeholder if exists (for cover image)
+                var coverPlaceholder = document.getElementById('cover-placeholder');
+                if (coverPlaceholder && previewId === 'cover-preview') {
+                    coverPlaceholder.classList.add('hidden');
+                }
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

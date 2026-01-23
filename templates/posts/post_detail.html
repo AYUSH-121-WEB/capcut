@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    {% include "posts/includes/post_card.html" %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-bold mb-4">Comments ({{ post.comments.count }})</h3>
+        <form action="{% url "add_comment" post.pk %}" method="post" class="mb-6">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <div class="mt-2 flex justify-end">
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Comment</button>
+            </div>
+        </form>
+        <div class="space-y-4">
+            {% for comment in post.comments.all %}
+            <div class="flex space-x-3">
+                {% if comment.user.profile.profile_image %}
+                <img src="{{ comment.user.profile.profile_image.url }}" class="w-8 h-8 rounded-full object-cover">
+                {% else %}
+                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-bold">{{ comment.user.username|make_list|first|upper }}</div>
+                {% endif %}
+                <div class="flex-1 bg-gray-50 p-3 rounded-lg">
+                    <div class="flex justify-between items-center mb-1">
+                        <a href="{% url "profile" comment.user.username %}" class="font-bold text-sm hover:underline">{{ comment.user.username }}</a>
+                        <span class="text-xs text-gray-400">{{ comment.created_at|timesince }} ago</span>
+                    </div>
+                    <p class="text-gray-800 text-sm">{{ comment.text|linebreaksbr }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-gray-500 text-center">No comments yet. Be the first!</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
