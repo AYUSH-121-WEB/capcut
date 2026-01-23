@@ -1,1 +1,2 @@
-web: gunicorn social_project.wsgi
+web: sh entrypoint.sh
+release: python manage.py migrate
