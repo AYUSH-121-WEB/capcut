@@ -27,8 +27,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-^_^a&)hh_4rhd)ef==v^3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
-ALLOWED_HOSTS = ("*")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+
+# ALLOWED_HOSTS = ["*"] 
 # Security settings for development
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
@@ -139,3 +140,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_URL = 'login'
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://anti.onrender.com",
+]
