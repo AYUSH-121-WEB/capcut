@@ -1,0 +1,6 @@
+WARNING:root:No DATABASE_URL environment variable set, and so no databases setup
+WARNING:root:No DATABASE_URL environment variable set, and so no databases setup
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+E:\anti\manage.py:16: DeprecationWarning: ssl.PROTOCOL_TLS is deprecated
+  context = ssl.SSLContext(ssl_version)
+^C
