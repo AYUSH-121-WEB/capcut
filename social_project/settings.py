@@ -28,9 +28,6 @@ ALLOWED_HOSTS = []
 if os.environ.get("ALLOWED_HOSTS"):
     ALLOWED_HOSTS.extend(os.environ.get("ALLOWED_HOSTS").split(","))
 
-ALLOWED_HOSTS = [
-    'anti.onrender.com',
-]
 
 # Add Render.com hostname to ALLOWED_HOSTS if present
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
