@@ -21,15 +21,16 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-^_^a&)hh_4rhd)ef==v^3x5xfbvbzh6+)15jr^rqt^)y2k$4tc')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = []
 if os.environ.get("ALLOWED_HOSTS"):
     ALLOWED_HOSTS.extend(os.environ.get("ALLOWED_HOSTS").split(","))
+
+ALLOWED_HOSTS = [
+    'anti.onrender.com',
+]
 
 # Add Render.com hostname to ALLOWED_HOSTS if present
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -38,21 +39,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 # Security settings
 # Enable strict HTTPS only in production (DEBUG=False) or if explicitly requested
-ENABLE_HTTPS = os.environ.get('ENABLE_HTTPS', 'false').lower() == 'true'
 
-if not DEBUG or ENABLE_HTTPS:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-else:
-    # Local development settings
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
 
 
 
