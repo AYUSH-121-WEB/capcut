@@ -24,9 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
-if os.environ.get("ALLOWED_HOSTS"):
-    ALLOWED_HOSTS.extend(os.environ.get("ALLOWED_HOSTS").split(","))
+ALLOWED_HOSTS = ["*","localhost", "127.0.0.1", "capcut-u9k2.onrender.com"]
+
 
 
 # Add Render.com hostname to ALLOWED_HOSTS if present
@@ -36,9 +35,6 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 # Security settings
 # Enable strict HTTPS only in production (DEBUG=False) or if explicitly requested
-
-
-
 
 # Application definition
 
@@ -85,7 +81,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'social_project.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
