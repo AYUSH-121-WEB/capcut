@@ -180,5 +180,3 @@ CSRF_TRUSTED_ORIGINS = [
     "https://anti.onrender.com",
 ]
 
-# if RENDER_EXTERNAL_HOSTNAME:
-#     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
