@@ -27,14 +27,12 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = ["*","localhost", "127.0.0.1", "capcut-u9k2.onrender.com"]
 
 
-
 # Add Render.com hostname to ALLOWED_HOSTS if present
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Security settings
-# Enable strict HTTPS only in production (DEBUG=False) or if explicitly requested
+
 
 # Application definition
 
@@ -182,5 +180,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://anti.onrender.com",
 ]
 
-if RENDER_EXTERNAL_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+# if RENDER_EXTERNAL_HOSTNAME:
+#     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
